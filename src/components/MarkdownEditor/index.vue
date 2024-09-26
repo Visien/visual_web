@@ -33,10 +33,10 @@ export default class extends Vue {
   private languageTypeList: { [key: string]: string } = {
     en: 'en',
     zh: 'zh-CN',
-    es: 'es',
-    ja: 'ja',
-    ko: 'ko',
-    it: 'it'
+    // es: 'es',
+    // ja: 'ja',
+    // ko: 'ko',
+    // it: 'it'
   }
 
   get editorOptions() {

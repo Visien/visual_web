@@ -42,10 +42,10 @@ export default class extends Vue {
   private languageTypeList: { [key: string]: string } = {
     en: 'en',
     zh: 'zh',
-    es: 'es-MX',
-    ja: 'ja',
-    ko: 'ko',
-    it: 'it'
+    // es: 'es-MX',
+    // ja: 'ja',
+    // ko: 'ko',
+    // it: 'it'
   }
 
   get show() {

@@ -11,6 +11,8 @@ info:
 servers:
   - url: /mock-api/v1
 tags:
+  - name: videostreams
+    description: Videostreams data related api.
   - name: articles
     description: Articles data related api.
   - name: roles
@@ -20,6 +22,216 @@ tags:
   - name: users
     description: Users related api.
 paths:
+  /videostreams:
+    get:
+      tags:
+        - videostreams
+      summary: Get Article List
+      description: Return a list of videostreams.
+      operationId: getVideoStreams
+      parameters:
+        - name: user
+          in: query
+          description: Used to filter videostreams by importance.
+          schema:
+            $ref: '#/components/schemas/VideoStream/properties/user'
+        - name: type
+          in: query
+          description: Used to filter videostreams by type.
+          schema:
+            $ref: '#/components/schemas/VideoStream/properties/type'
+        - name: title
+          in: query
+          description: Used to filter videostreams by matched title substring.
+          schema:
+            $ref: '#/components/schemas/VideoStream/properties/title'
+        - name: page
+          in: query
+          description: The wanted page number (one page).
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+        - name: limit
+          in: query
+          description: The maximum number of videostreams returned for one page.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+        - name: sort
+          in: query
+          description: Optional sorting order for videostreams.
+          schema:
+            type: string
+            enum:
+              - +id
+              - -id
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        format: int32
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/VideoStream'
+    post:
+      tags:
+        - videostreams
+      summary: Create New VideoStream
+      description: Create a new VideoStream.
+      operationId: createVideoStream
+      security:
+        - AccessTokenAuth: []
+      parameters:
+        - name: videostream
+          in: query
+          required: true
+          description: The data for new VideoStream.
+          schema:
+            $ref: '#/components/schemas/VideoStream'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                  data:
+                    type: object
+                    properties:
+                      videostream:
+                        $ref: '#/components/schemas/VideoStream'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+  /videostreams/{id}:
+    get:
+      tags:
+        - videostreams
+      summary: Get Article Detail
+      description: Get videostream detail by ID.
+      operationId: getVideoStream
+      security:
+        - AccessTokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: VideoStream id.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                  data:
+                    type: object
+                    properties:
+                      videostream:
+                        $ref: '#/components/schemas/VideoStream'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - videostreams
+      summary: Update Article Detail
+      description: Update videostreams deatail by ID.
+      operationId: updateVideoStream
+      security:
+        - AccessTokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: VideoStream id.
+          schema:
+            type: integer
+            format: int64
+        - name: videostream
+          in: query
+          required: true
+          description: data for the updated VideoStream.
+          schema:
+            $ref: '#/components/schemas/VideoStream'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                  data:
+                    type: object
+                    properties:
+                      videostream:
+                        $ref: '#/components/schemas/VideoStream'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - videostreams
+      summary: Delete VideoStream
+      description: Delete videostream by ID.
+      operationId: deleteVideoStream
+      security:
+        - AccessTokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: VideoStream id.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
   /articles:
     get:
       tags:
@@ -746,6 +958,64 @@ components:
       required:
         - code
         - message
+    VideoStream:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user:
+          type: string
+          enum:
+            - test
+            - admin
+            - visen
+        type:
+          type: string
+          enum:
+            - local stream
+            - remote stream
+            - test stream
+        title:
+          type: string
+          enum:
+            - 一号摄像头
+            - 二号摄像头
+            - 三号摄像头
+            - 四号摄像头
+        info:
+          type: string
+          enum:
+            - 一号摄像头
+            - 二号摄像头
+            - 三号摄像头
+            - 四号摄像头
+        startTime:
+          $ref: '#/components/schemas/Timestamp'
+        runningTime:
+          type: string
+          enum:
+            - 1.5h
+            - 1.8h
+            - 5.3h
+            - 8.4h
+        endTime:
+          $ref: '#/components/schemas/Timestamp'
+        Operations:
+          type: array
+          items:
+            type: string
+            enum:
+              - remove
+              - retry
+              - details
+      required:
+       - id
+       - user
+       - type
+       - title
+       - startTime
+       - status
     Article:
       type: object
       properties:

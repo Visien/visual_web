@@ -336,6 +336,18 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/videostream',
+    component: 'Layout',
+    redirect: '/videostream/index',
+    name: 'VideoStream',
+    meta: {
+      title: 'videoStream',
+      icon: 'tree'
+    }
+  },
+  
+  
+  {
     path: '/table',
     component: 'Layout',
     redirect: '/table/complex-table',

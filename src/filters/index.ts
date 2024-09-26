@@ -11,6 +11,16 @@ export const articleStatusFilter = (status: string) => {
   return statusMap[status]
 }
 
+export const vsStatusFilter = (status: string) => {
+  const statusMap: { [key: string]: string } = {
+    running: 'success',
+    retry: 'success',
+    ready: 'info',
+    terminated: 'danger'
+  }
+  return statusMap[status]
+}
+
 // Filter to uppercase the first character
 export const uppercaseFirstChar = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1)

@@ -1,3 +1,5 @@
+import { system } from "faker";
+
 export default {
   route: {
     dashboard: 'Dashboard',
@@ -62,7 +64,44 @@ export default {
     clipboard: 'Clipboard',
     i18n: 'I18n',
     externalLink: 'External Link',
-    profile: 'Profile'
+    profile: 'Profile',
+    systemConf: 'System Config',
+    equipmentManage: 'Equipment Manage',
+    userManage: 'User Manage',
+    dataManage: 'Data Manage',
+
+    VideoStream: 'Video Stream',
+    VideoStreamManage:'Video Stream Manage',
+    MediaResourceManage:'Media Resource Manage',
+    AlgorithmManage:'Algorithm Manage',
+    preview: 'Preview',
+
+    AIAlgorithm: 'AI Algorithm',
+    UniversalTargetDetection: 'Universal Target Detection',
+    FallBehaviorRecognition: 'Fall Behavior Recognition',
+    CrossingBehaviorRecognition: 'Crossing Behavior Recognition',
+    SmokeDetection: 'Smoke Detection',
+    FlameDetection: 'Flame Detection',
+
+    BodyAnalysis: 'Body Analysis',
+    BodyDetection: 'Body Detection',
+    BodyKeyPoints: 'Body Key Points',
+    BodyPartSegmentation: 'Body Part Segmentation',
+    BodyDensePosture: 'Body Dense Posture',
+    FaceDetection: 'Face Detection',
+    FaceKeyPoints: 'Face Key Points',
+    FaceRecognition: 'Face Recognition',
+
+    PostalIndustry: 'Postal Industry',
+    RiskBehaviors18: 'Risk Behaviors 18',
+    SafetyAccidents9: 'Safety Accidents 9',
+
+    Oilfield: 'Oilfield',
+    PersonnelClothing: 'Personnel Clothing',
+    HandHanging: 'Hand Hanging',
+    GasCylinderPlacement: 'Gas Cylinder Placement',
+    SeatBelt: 'Seat Belt',
+    SpecificationBehavior: 'Specification Behavior',
   },
   navbar: {
     logOut: 'Log Out',
@@ -114,8 +153,17 @@ export default {
     dragTips1: 'The default order',
     dragTips2: 'The after dragging order',
     title: 'Title',
-    importance: 'Importance',
+    user: 'User',
     type: 'Type',
+    info: 'Info',
+    startTime: 'StartTime',
+    runningTime: 'RunningTime',
+    endTime: 'EndTime',
+    Operations: 'Operations',
+    run: 'Run',
+    terminated: 'Term',
+
+    importance: 'Importance',
     remark: 'Remark',
     search: 'Search',
     add: 'Add',

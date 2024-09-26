@@ -18,9 +18,9 @@
         <tags-view v-if="showTagsView" />
       </div>
       <app-main />
-      <right-panel v-if="showSettings">
+      <!-- <right-panel v-if="showSettings">
         <settings />
-      </right-panel>
+      </right-panel> -->
     </div>
   </div>
 </template>
@@ -39,7 +39,7 @@ import ResizeMixin from './mixin/resize'
   components: {
     AppMain,
     Navbar,
-    RightPanel,
+    // RightPanel,
     Settings,
     Sidebar,
     TagsView

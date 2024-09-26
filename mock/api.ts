@@ -1,3 +1,4 @@
+export * from './videostreams'
 export * from './articles'
 export * from './role'
 export * from './transactions'

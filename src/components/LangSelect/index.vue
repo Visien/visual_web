@@ -23,7 +23,7 @@
       >
         English
       </el-dropdown-item>
-      <el-dropdown-item
+      <!-- <el-dropdown-item
         :disabled="language==='es'"
         command="es"
       >
@@ -46,7 +46,7 @@
         command="it"
       >
         Italiano
-      </el-dropdown-item>
+      </el-dropdown-item> -->
     </el-dropdown-menu>
   </el-dropdown>
 </template>

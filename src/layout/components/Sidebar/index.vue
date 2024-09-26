@@ -15,6 +15,11 @@
         :collapse-transition="false"
         mode="vertical"
       >
+      <!-- <div style="height: 45px; display: flex; justify-content: center; align-items: center; margin-top: 5px; border-bottom: 1px solid #ccc;">
+        <img src="../../../assets/logo.png" alt style="width: 25px; " />
+        <b style="width: 25px; color: black; position: relative; margin-left: 12px">ICON WEB UI</b>
+      </div> -->
+
         <sidebar-item
           v-for="route in routes"
           :key="route.path"

@@ -1,3 +1,17 @@
+export interface IVideoStreamData {
+  id: number
+  user: string
+  type: string
+  title: string
+  info: string
+  startTime: string | number
+  runningTime: string | number
+  endTime: string | number
+  status: string
+  Operations: string[]
+}
+
+
 export interface IArticleData {
   id: number
   status: string
