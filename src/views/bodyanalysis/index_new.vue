@@ -139,7 +139,7 @@
   
   <script>
   import { getAlarmAlarm, getAlarmHistory, deleteAlgorit } from '@/api/alarm'
-  import { VideostreamList_aialgorithm } from '@/api/videostream'
+  import { VideostreamList_bodyanalysis } from '@/api/videostream'
   
   export default {
     name: "Icons",
@@ -160,7 +160,25 @@
           info:'',
           details:''
         },
-        videoGroupOptions: [
+        videoGroupOptions: 
+        [
+            {
+                label: "等待数据注入",
+                options: [
+                    {
+                        value: "http://123.160.244.172:33334/live/local.live.mp4",
+                        label: "油田本地视频流(测试1)"
+                    },
+                    {
+                        value: "1",
+                        label: "空视频流(测试1)"
+                    },
+                    {
+                        value: "2",
+                        label: "空视频流(测试2)"
+                    }
+                ]
+            }
         ]
       };
     },
@@ -179,7 +197,7 @@
         this.dialogVisible2 = true
       },
       async getVideo() {
-        const res = await VideostreamList_aialgorithm()
+        const res = await VideostreamList_bodyanalysis()
         console.log(res)
         // res.data = []
         if (res.code === 200 && res.data.length > 0) {

@@ -4,7 +4,7 @@
       <el-input
         v-model="listQuery.title"
         placeholder="URL"
-        style="width: 200px;margin-right: 20px;"
+        style="width: 320px; margin-right: 20px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
@@ -109,7 +109,7 @@
       <el-table-column
         label="URL"
         prop="url"
-        width="320"
+        width="320px"
       >
         <template slot-scope="{row}">
           <span>{{ row.url }}</span>
@@ -125,12 +125,13 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="宽*长"
+        label="宽*高"
         prop="w"
+        min-width="100px"
         align="center"
       >
         <template slot-scope="{row}">
-          <span>{{ row.h }}*{{ row.w }}</span>
+          <span>{{ row.w }}×{{ row.h }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -145,6 +146,7 @@
       <el-table-column
         label="比特率(k)"
         prop="bit_rate_k"
+        min-width="100px"
         align="center"
       >
         <template slot-scope="{row}">
@@ -155,6 +157,7 @@
         label="更新时间"
         prop="update_time"
         align="center"
+        min-width="190px"
       >
         <template slot-scope="{row}">
           <span>{{ formatISODate(row.update_time) }}</span>
@@ -163,8 +166,8 @@
       <el-table-column
         :label="$t('table.actions')"
         align="center"
-        width="280"
         class-name="fixed-width"
+        width="100px"
       >
         <template slot-scope="{row, $index}">
           <!-- <el-button

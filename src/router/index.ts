@@ -176,10 +176,26 @@ export const asyncRoutes: RouteConfig[] = [
     children: [
       {
         path: 'index',
-        component: () => import(/* webpackChunkName: "icons" */ '@/views/preview/index.vue'),
+        component: () => import(/* webpackChunkName: "icons" */ '@/views/preview/index_old.vue'),
         name: 'Preview',
         meta: {
           title: 'preview',
+          icon: 'international',
+          noCache: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/ri_preview',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import(/* webpackChunkName: "icons" */ '@/views/ri_preview/index.vue'),
+        name: 'Research and Innovation Preview',
+        meta: {
+          title: 'ri_preview',
           icon: 'international',
           noCache: true
         }
@@ -251,7 +267,7 @@ export const asyncRoutes: RouteConfig[] = [
   // componentsRouter,
   // chartsRouter,
   // nestedRouter,
-  tableRouter,
+  // tableRouter,
   // {
   //   path: '/example',
   //   component: Layout,

@@ -3,8 +3,8 @@
     <div class="filter-container">
       <el-input
         v-model="listQuery.title"
-        placeholder="name"
-        style="width: 200px;margin-right: 20px;"
+        placeholder="算法名"
+        style="width: 200px; margin-right: 20px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
@@ -107,9 +107,9 @@
       @sort-change="sortChange"
     >
       <el-table-column
-        label="算法"
+        label="算法名"
         prop="name"
-        width="240"
+        width="200px"
       >
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
@@ -119,7 +119,7 @@
         label="类型"
         prop="tag"
         align="center"
-        width="140"
+        width="120px"
       >
         <template slot-scope="{row}">
           <span>{{ row.tag }}</span>
@@ -129,7 +129,7 @@
         label="描述"
         prop="description"
         align="center"
-        width="280"
+        min_width="240px"
       >
         <template slot-scope="{row}">
           <span>{{ row.description }}</span>
@@ -139,7 +139,7 @@
         label="脚本位置"
         prop="scripts_path"
         align="center"
-        width="400"
+        min_width="240px"
       >
         <template slot-scope="{row}">
           <span>{{ row.scripts_path }}</span>
@@ -149,7 +149,7 @@
         label="算法信息"
         prop="info"
         align="center"
-        width="140"
+        min_width="100px"
       >
         <template slot-scope="{row}">
           <span>{{ row.info }}</span>
@@ -157,9 +157,9 @@
       </el-table-column>
       <el-table-column
         label="更新时间"
-        width="260"
         prop="update_time"
         align="center"
+        width="190px"
       >
         <template slot-scope="{row}">
           <span>{{ formatISODate(row.update_time) }}</span>
@@ -168,7 +168,7 @@
       <el-table-column
         :label="$t('table.actions')"
         align="center"
-        width="280"
+        width="100px"
         class-name="fixed-width"
       >
         <template slot-scope="{row, $index}">

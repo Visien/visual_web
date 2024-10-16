@@ -4,7 +4,7 @@
       <el-input
         v-model="listQuery.title"
         placeholder="name"
-        style="width: 200px;margin-right: 20px;"
+        style="width: 260px;margin-right: 20px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
@@ -94,7 +94,7 @@
         sortable
         prop="vsid"
         align="center"
-        width="100"
+        width="80px"
       >
         <template slot-scope="{row}">
           <span>{{ row.vsid }}</span>
@@ -103,51 +103,50 @@
       <el-table-column
         label="标题"
         prop="title"
-        align="center"
-        width="140"
+        width="200"
       >
         <template slot-scope="{row}">
           <span>{{ row.title }}</span>
         </template>
       </el-table-column>
+      
       <el-table-column
         label="所属项目"
         prop="project"
         align="center"
-        width="160"
+        width="120px"
       >
         <template slot-scope="{row}">
           <span>{{ row.project }}</span>
         </template>
       </el-table-column>
       <el-table-column
-        label="创建者"
-        prop="username"
-        align="center"
-        width="120"
-      >
-        <template slot-scope="{row}">
-          <span>{{ row.username }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="视频源类型"
-        prop="ms_kind"
-        align="center"
-        width="140"
-      >
-        <template slot-scope="{row}">
-          <span>{{ row.ms_kind }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
         label="算法"
         prop="algo_name"
         align="center"
-        width="140"
+        min-width="140px"
       >
         <template slot-scope="{row}">
           <span>{{ row.algo_name }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        label="status"
+        prop="status"
+        align="center"
+        width="100px"
+      >
+        <template slot-scope="{row}">
+          <el-tag type="success" v-if="row.status === 'running'">
+            {{ row.status }}
+          </el-tag>
+          <el-tag type="info" v-if="row.status === 'ready'">
+            {{ row.status }}
+          </el-tag>
+          <el-tag type="danger" v-if="row.status === 'stopped'">
+            {{ row.status }}
+          </el-tag>
         </template>
       </el-table-column>
       <!-- <el-table-column
@@ -164,7 +163,7 @@
         label="mp4拉流地址"
         prop="play_url_mp4"
         align="center"
-        width="300"
+        width="320px"
       >
         <template slot-scope="{row}">
           <span>{{ row.play_url_mp4 }}</span>
@@ -173,9 +172,9 @@
 
       <el-table-column
         label="开始/结束时间 "
-        width="260"
         prop="update_time"
         align="center"
+        min-width="180px"
       >
         <template slot-scope="{row}">
           <span>{{ row.status === 'running' ? formatISODate(row.start_time) : formatISODate(row.update_time) }}</span>
@@ -183,36 +182,39 @@
       </el-table-column>
       <el-table-column
         label="运行时长 "
-        width="160"
         prop="update_time"
         align="center"
+        width="100px"
       >
         <template slot-scope="{row}">
           <span>{{ row.status === 'running' ? computeTime(row.start_time) : '--' }}</span>
         </template>
       </el-table-column>
+
       <el-table-column
-        label="status"
-        prop="status"
+        label="创建者"
+        prop="username"
         align="center"
-        width="300"
+        min-width="100px"
       >
         <template slot-scope="{row}">
-          <el-tag type="success" v-if="row.status === 'running'">
-            {{ row.status }}
-          </el-tag>
-          <el-tag type="info" v-if="row.status === 'ready'">
-            {{ row.status }}
-          </el-tag>
-          <el-tag type="danger" v-if="row.status === 'stopped'">
-            {{ row.status }}
-          </el-tag>
+          <span>{{ row.username }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="源类型"
+        prop="ms_kind"
+        align="center"
+        min-width="80px"
+      >
+        <template slot-scope="{row}">
+          <span>{{ row.ms_kind }}</span>
         </template>
       </el-table-column>
       <el-table-column
         :label="$t('table.actions')"
         align="center"
-        width="280"
+        width="240px"
         class-name="fixed-width"
       >
         <template slot-scope="{row, $index}">
@@ -657,8 +659,8 @@ export default {
         frame_rate: '',
         bit_rate_k: '',
         rtsp_server_url: "",
-        play_url_mp4: "string",
-        rtsp_log_path: "string",
+        play_url_mp4: "play_url",
+        rtsp_log_path: "rtsp/log/live_path.log",
         pid: 0,
         status: "stopped",
         start_time: "string",
@@ -810,14 +812,15 @@ export default {
       }
       const res = await createVideostream(this.tempvsData)
       if (res.code === 200) {
-        this.list.push(res.data)
-        this.dialogFormVisible = false
         this.$notify({
           title: '成功',
           message: '创建成功',
           type: 'success',
           duration: 2000
         })
+        this.handleFilter()
+        this.dialogFormVisible = false
+
       } else {
         this.$notify({
           title: '创建失败',
@@ -957,7 +960,7 @@ export default {
           type: 'success',
           duration: 2000
         })
-        this.list.splice(index, 1)
+        this.handleFilter()
       } else {
         this.$notify({
           title: '删除失败',

@@ -20,8 +20,8 @@
           <div class="table">
             <div class="table-row" v-for="(item, index) in historyList" :key="index">
               <span class="status" :class="item.level > 3 ? 'red' : 'yellow'"></span>
-              <span class="column vs-title">{{item.vs_title}}</span>
-              <span class="column info">{{item.info}}</span>
+              <span class="column vs-title">{{ item.vs_title }}</span>
+              <span class="column info">{{ item.info }}</span>
               <span class="column alarm-time">{{ item.alarm_time.replace('T', ' ') }}</span>
               <span class="column view" @click="watchItem(item)">查看</span>
             </div>
@@ -31,30 +31,17 @@
 
 
 
-      <video
-        :key="videoKey"
-        ref="video_ground"
-        autoplay
-        muted
-        class="video-ground"
-      >
+      <video :key="videoKey" ref="video_ground" autoplay muted class="video-ground">
         <source :src="videoSource" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
     </div>
-    <el-dialog
-      title="操作提示"
-      :visible.sync="dialogVisible"
-      width="20%"
-      center
-    >
+    <el-dialog title="操作提示" :visible.sync="dialogVisible" width="20%" center>
       <div class="dialog-content">
         <div class="hint">{{ info }}</div>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button type="danger" @click="handleDelete"
-          >确认</el-button
-        >
+        <el-button type="danger" @click="handleDelete">确认</el-button>
       </div>
     </el-dialog>
     <el-dialog title="" :visible.sync="dialogVisible2">
@@ -67,70 +54,38 @@
       <!-- 控制台 -->
       <el-row style="width: 100%; top: 25%;" :gutter="20">
         <el-col :span="8">
-          <div
-            class="flex items-center justify-start"
-            style="width:100%; height:85%"
-          >
-            <el-select
-              @change="selectVideoSource"
-              v-model="videoSource"
-              placeholder="video source"
-              style="margin-left:1.875rem;width:16.25rem;"
-            >
-              <el-option-group
-                v-for="videoGroup in videoGroupOptions"
-                :key="videoGroup.label"
-                :label="videoGroup.label"
-              >
-                <el-option
-                  v-for="item in videoGroup.options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
+          <div class="flex items-center justify-start" style="width:100%; height:85%">
+            <el-select @change="selectVideoSource" v-model="videoSource" placeholder="video source"
+              style="margin-left:1.875rem;width:16.25rem;">
+              <el-option-group v-for="videoGroup in videoGroupOptions" :key="videoGroup.label"
+                :label="videoGroup.label">
+                <el-option v-for="item in videoGroup.options" :key="item.value" :label="item.label"
+                  :value="item.value" />
               </el-option-group>
             </el-select>
           </div>
         </el-col>
         <!-- 上一个 -->
         <el-col :span="2">
-          <div
-            class="flex items-center justify-center"
-            style="width:100%; height:85%"
-          >
+          <div class="flex items-center justify-center" style="width:100%; height:85%">
             <el-button icon="el-icon-arrow-left" circle />
           </div>
         </el-col>
         <!-- 播放/暂停 -->
         <el-col :span="2">
-          <div
-            class="flex items-center justify-center"
-            style="width:100%; heigth:100%;"
-          >
-            <el-button
-              size="large"
-              type="primary"
-              icon="el-icon-caret-right"
-              style="font-size: 1.25rem;"
-              circle
-              @click="togglePlayPause"
-            ></el-button>
+          <div class="flex items-center justify-center" style="width:100%; heigth:100%;">
+            <el-button size="large" type="primary" icon="el-icon-caret-right" style="font-size: 1.25rem;" circle
+              @click="togglePlayPause"></el-button>
           </div>
         </el-col>
         <!-- 下一个 -->
         <el-col :span="2">
-          <div
-            class="flex items-center justify-center"
-            style="width:100%; height:85%"
-          >
+          <div class="flex items-center justify-center" style="width:100%; height:85%">
             <el-button icon="el-icon-arrow-right" circle />
           </div>
         </el-col>
         <el-col :span="10">
-          <div
-            class="flex items-center justify-center"
-            style="width:100%; height:85%"
-          ></div>
+          <div class="flex items-center justify-center" style="width:100%; height:85%"></div>
         </el-col>
       </el-row>
     </div>
@@ -139,46 +94,28 @@
 
 <script>
 import { getAlarmAlarm, getAlarmHistory, deleteAlgorit } from '@/api/alarm'
-import { VideostreamList_postalindustry } from '@/api/videostream'
+import { VideostreamList_ri } from '@/api/videostream'
 
 export default {
   name: "Icons",
   data() {
     return {
-      uuid:'',
-      info:'',
-      vsid:'',
+      uuid: '',
+      info: '',
+      vsid: '',
       videoKey: 0,
       videoSource: "",
       isPlaying: true,
       dialogVisible: false,
       dialogVisible2: false,
-      list:[],
-      historyList:[],
-      targetItem:{
-        image_url:'',
-        info:'',
-        details:''
+      list: [],
+      historyList: [],
+      targetItem: {
+        image_url: '',
+        info: '',
+        details: ''
       },
-      videoGroupOptions: 
-      [
-          {
-              label: "等待数据注入",
-              options: [
-                  {
-                      value: "http://123.160.244.172:33334/live/local.live.mp4",
-                      label: "油田本地视频流(测试1)"
-                  },
-                  {
-                      value: "1",
-                      label: "空视频流(测试1)"
-                  },
-                  {
-                      value: "2",
-                      label: "空视频流(测试2)"
-                  }
-              ]
-          }
+      videoGroupOptions: [
       ]
     };
   },
@@ -197,13 +134,13 @@ export default {
       this.dialogVisible2 = true
     },
     async getVideo() {
-      const res = await VideostreamList_postalindustry()
+      const res = await VideostreamList_ri()
       console.log(res)
       // res.data = []
       if (res.code === 200 && res.data.length > 0) {
         this.videoGroupOptions = [
           {
-            label: "AI算法",
+            label: "研创成果展示",
             options: res.data.map(item => ({
               value: item.play_url_mp4,
               label: item.title
@@ -225,10 +162,10 @@ export default {
     },
     async getAlarm() {
       const res = await getAlarmAlarm({
-        vsid:this.vsid
+        vsid: this.vsid
       })
       if (res.code === 200) {
-        if(res.data.ac == 1 && this.uuid == res.data.uuid) { // 预警
+        if (res.data.ac == 1 && this.uuid == res.data.uuid) { // 预警
           this.dialogVisible = true
           this.info = res.data.info
         }
@@ -237,7 +174,7 @@ export default {
     },
     async getHistory() {
       const res = await getAlarmHistory({
-        vsid:this.vsid
+        vsid: this.vsid
       })
       if (res.code === 200) {
         this.historyList = res.data
@@ -347,6 +284,7 @@ export default {
     bottom: 0;
     box-shadow: 0.25rem -0.125rem 0.375rem rgb(0 21 41 / 35%);
   }
+
   .radius_icon {
     position: absolute;
     top: 3.75rem;
@@ -356,10 +294,12 @@ export default {
     z-index: 100;
     border-radius: 50%;
   }
+
   .dialog-content {
     text-align: center;
     margin-top: -0.625rem;
   }
+
   .dialog-content img {
     width: 3.125rem;
     height: 3.125rem;
@@ -368,11 +308,13 @@ export default {
   .dialog-footer {
     text-align: center;
   }
+
   .hint {
     font-size: 0.875rem;
     color: #999;
     margin-top: 0.625rem;
   }
+
   // .btn {
   //     cursor: pointer;
   //     position: relative;
@@ -458,6 +400,7 @@ export default {
   //     transition: 0s;
   // }
 }
+
 .modal-content {
   position: absolute;
   right: 0px;
@@ -467,18 +410,25 @@ export default {
   background-color: #ffffff;
   border-radius: 8px;
   overflow: hidden;
-  font-size:12px;
+  font-size: 12px;
 
   z-index: 10;
-  width: 30%; 
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  width: 30%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   animation-name: animatetop;
   animation-duration: 0.4s;
 }
 
 @keyframes animatetop {
-  from {top: -300px; opacity: 0}
-  to {top: 0; opacity: 1}
+  from {
+    top: -300px;
+    opacity: 0
+  }
+
+  to {
+    top: 0;
+    opacity: 1
+  }
 }
 
 .modal-header {
@@ -486,7 +436,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 10px 10px;
-  background-color: #0073e6; /* 深蓝色 */
+  background-color: #0073e6;
+  /* 深蓝色 */
   color: #ffffff;
   font-size: 12px;
   font-weight: bold;
@@ -536,7 +487,8 @@ export default {
   background-color: #ffffff;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  font-size: 11px; /* 进一步压缩字体 */
+  font-size: 11px;
+  /* 进一步压缩字体 */
 }
 
 .status {
@@ -562,11 +514,11 @@ export default {
 }
 
 .vs-title {
-  width: 20%;
+  width: 30%;
 }
 
 .info {
-  width: 40%;
+  width: 30%;
   color: #555555;
 }
 
@@ -601,14 +553,16 @@ export default {
   text-decoration: none;
   cursor: pointer;
 }
+
 .item {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .itemImg {
   display: block;
-  margin-bottom:30px;
+  margin-bottom: 30px;
   height: 200px;
 }
 </style>

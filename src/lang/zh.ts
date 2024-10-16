@@ -73,6 +73,7 @@ export default {
     MediaResourceManage:'媒体源管理',
     AlgorithmManage:'算法管理',
     preview: '算法预览',
+    ri_preview: '研创展成果演示',
 
     AIAlgorithm: 'AI 算法',
     UniversalTargetDetection: '通用目标检测',

@@ -1,575 +1,614 @@
 <template>
-  <div class="app-container">
-    <div class="filter-container">
-      <el-input
-        v-model="listQuery.title"
-        :placeholder="$t('table.title')"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-select
-        v-model="listQuery.importance"
-        :placeholder="$t('table.importance')"
-        clearable
-        style="width: 120px"
-        class="filter-item"
+  <div class="icons-container">
+    <!-- 播放界面 -->
+    <div class="radius">
+      <!-- <img class="radius_icon" @click="showDialog()" src="@/assets/icon1.png" alt="" /> -->
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="title">历史识别记录</span>
+          <div class="status-legend">
+            <div class="legend-item">
+              <span class="status-icon yellow"></span><span>违规</span>
+            </div>
+            <div class="legend-item">
+              <span class="status-icon red"></span><span>风险</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="table">
+            <div class="table-row" v-for="(item, index) in historyList" :key="index">
+              <span class="status" :class="item.level > 3 ? 'red' : 'yellow'"></span>
+              <span class="column vs-title">{{item.vs_title}}</span>
+              <span class="column info">{{item.info}}</span>
+              <span class="column alarm-time">{{ item.alarm_time.replace('T', ' ') }}</span>
+              <span class="column view" @click="watchItem(item)">查看</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <video
+        :key="videoKey"
+        ref="video_ground"
+        autoplay
+        muted
+        class="video-ground"
       >
-        <el-option
-          v-for="item in importanceOptions"
-          :key="item"
-          :label="item"
-          :value="item"
-        />
-      </el-select>
-      <el-select
-        v-model="listQuery.type"
-        :placeholder="$t('table.type')"
-        clearable
-        class="filter-item"
-        style="width: 130px"
-      >
-        <el-option
-          v-for="item in calendarTypeOptions"
-          :key="item.key"
-          :label="item.displayName+'('+item.key+')'"
-          :value="item.key"
-        />
-      </el-select>
-      <el-select
-        v-model="listQuery.sort"
-        style="width: 140px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in sortOptions"
-          :key="item.key"
-          :label="item.label"
-          :value="item.key"
-        />
-      </el-select>
-      <el-button
-        v-waves
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="handleFilter"
-      >
-        {{ $t('table.search') }}
-      </el-button>
-      <el-button
-        class="filter-item"
-        style="margin-left: 10px;"
-        type="primary"
-        icon="el-icon-edit"
-        @click="handleCreate"
-      >
-        {{ $t('table.add') }}
-      </el-button>
-      <el-button
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="primary"
-        icon="el-icon-download"
-        @click="handleDownload"
-      >
-        {{ $t('table.export') }}
-      </el-button>
-      <el-checkbox
-        v-model="showReviewer"
-        class="filter-item"
-        style="margin-left:15px;"
-        @change="tableKey=tableKey+1"
-      >
-        {{ $t('table.reviewer') }}
-      </el-checkbox>
+        <source :src="videoSource" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
     </div>
-
-    <el-table
-      :key="tableKey"
-      v-loading="listLoading"
-      :data="list"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%;"
-      @sort-change="sortChange"
-    >
-      <el-table-column
-        :label="$t('table.id')"
-        prop="id"
-        sortable="custom"
-        align="center"
-        width="80"
-        :class-name="getSortClass('id')"
-      >
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('table.date')"
-        width="180px"
-        align="center"
-      >
-        <template slot-scope="{row}">
-          <span>{{ row.timestamp | parseTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('table.title')"
-        min-width="150px"
-      >
-        <template slot-scope="{row}">
-          <span
-            class="link-type"
-            @click="handleUpdate(row)"
-          >{{ row.title }}</span>
-          <el-tag>{{ row.type | typeFilter }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('table.author')"
-        width="180px"
-        align="center"
-      >
-        <template slot-scope="{row}">
-          <span>{{ row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        v-if="showReviewer"
-        :label="$t('table.reviewer')"
-        width="110px"
-        align="center"
-      >
-        <template slot-scope="{row}">
-          <span style="color:red;">{{ row.reviewer }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('table.importance')"
-        width="105px"
-      >
-        <template slot-scope="{row}">
-          <svg-icon
-            v-for="n in +row.importance"
-            :key="n"
-            name="star"
-            class="meta-item__icon"
-          />
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('table.readings')"
-        align="center"
-        width="95"
-      >
-        <template slot-scope="{row}">
-          <span
-            v-if="row.pageviews"
-            class="link-type"
-            @click="handleGetPageviews(row.pageviews)"
-          >{{ row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('table.status')"
-        class-name="status-col"
-        width="100"
-      >
-        <template slot-scope="{row}">
-          <el-tag :type="row.status | articleStatusFilter">
-            {{ row.status }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('table.actions')"
-        align="center"
-        width="230"
-        class-name="fixed-width"
-      >
-        <template slot-scope="{row, $index}">
-          <el-button
-            type="primary"
-            size="mini"
-            @click="handleUpdate(row)"
-          >
-            {{ $t('table.edit') }}
-          </el-button>
-          <el-button
-            v-if="row.status!=='published'"
-            size="mini"
-            type="success"
-            @click="handleModifyStatus(row,'published')"
-          >
-            {{ $t('table.publish') }}
-          </el-button>
-          <el-button
-            v-if="row.status!=='draft'"
-            size="mini"
-            @click="handleModifyStatus(row,'draft')"
-          >
-            {{ $t('table.draft') }}
-          </el-button>
-          <el-button
-            v-if="row.status!=='deleted'"
-            size="mini"
-            type="danger"
-            @click="handleDelete(row, $index)"
-          >
-            {{ $t('table.delete') }}
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
-
     <el-dialog
-      :title="textMap[dialogStatus]"
-      :visible.sync="dialogFormVisible"
+      title="操作提示"
+      :visible.sync="dialogVisible"
+      width="20%"
+      center
     >
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="tempArticleData"
-        label-position="left"
-        label-width="100px"
-        style="width: 400px; margin-left:50px;"
-      >
-        <el-form-item
-          :label="$t('table.type')"
-          prop="type"
+      <div class="dialog-content">
+        <div class="hint">{{ info }}</div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="danger" @click="handleDelete"
+          >确认</el-button
         >
-          <el-select
-            v-model="tempArticleData.type"
-            class="filter-item"
-            placeholder="Please select"
-          >
-            <el-option
-              v-for="item in calendarTypeOptions"
-              :key="item.key"
-              :label="item.displayName"
-              :value="item.key"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          :label="$t('table.date')"
-          prop="timestamp"
-        >
-          <el-date-picker
-            v-model="tempArticleData.timestamp"
-            type="datetime"
-            placeholder="Please pick a date"
-          />
-        </el-form-item>
-        <el-form-item
-          :label="$t('table.title')"
-          prop="title"
-        >
-          <el-input v-model="tempArticleData.title" />
-        </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-select
-            v-model="tempArticleData.status"
-            class="filter-item"
-            placeholder="Please select"
-          >
-            <el-option
-              v-for="item in statusOptions"
-              :key="item"
-              :label="item"
-              :value="item"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('table.importance')">
-          <el-rate
-            v-model="tempArticleData.importance"
-            :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-            :max="3"
-            style="margin-top:8px;"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('table.remark')">
-          <el-input
-            v-model="tempArticleData.abstractContent"
-            :autosize="{minRows: 2, maxRows: 4}"
-            type="textarea"
-            placeholder="Please input"
-          />
-        </el-form-item>
-      </el-form>
-      <div
-        slot="footer"
-        class="dialog-footer"
-      >
-        <el-button @click="dialogFormVisible = false">
-          {{ $t('table.cancel') }}
-        </el-button>
-        <el-button
-          type="primary"
-          @click="dialogStatus==='create'?createData():updateData()"
-        >
-          {{ $t('table.confirm') }}
-        </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog
-      :visible.sync="dialogPageviewsVisible"
-      title="Reading statistics"
-    >
-      <el-table
-        :data="pageviewsData"
-        border
-        fit
-        highlight-current-row
-        style="width: 100%"
-      >
-        <el-table-column
-          prop="key"
-          label="Channel"
-        />
-        <el-table-column
-          prop="pageviews"
-          label="Pageviews"
-        />
-      </el-table>
-      <span
-        slot="footer"
-        class="dialog-footer"
-      >
-        <el-button
-          type="primary"
-          @click="dialogPageviewsVisible = false"
-        >{{ $t('table.confirm') }}</el-button>
-      </span>
+    <el-dialog title="" :visible.sync="dialogVisible2">
+      <div class="item">
+        <img class="itemImg" :src="targetItem.image_url" alt="">
+        <div v-html="targetItem.details"></div>
+      </div>
     </el-dialog>
+    <div class="video-console flex items-center justify-center">
+      <!-- 控制台 -->
+      <el-row style="width: 100%; top: 25%;" :gutter="20">
+        <el-col :span="8">
+          <div
+            class="flex items-center justify-start"
+            style="width:100%; height:85%"
+          >
+            <el-select
+              @change="selectVideoSource"
+              v-model="videoSource"
+              placeholder="video source"
+              style="margin-left:1.875rem;width:16.25rem;"
+            >
+              <el-option-group
+                v-for="videoGroup in videoGroupOptions"
+                :key="videoGroup.label"
+                :label="videoGroup.label"
+              >
+                <el-option
+                  v-for="item in videoGroup.options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-option-group>
+            </el-select>
+          </div>
+        </el-col>
+        <!-- 上一个 -->
+        <el-col :span="2">
+          <div
+            class="flex items-center justify-center"
+            style="width:100%; height:85%"
+          >
+            <el-button icon="el-icon-arrow-left" circle />
+          </div>
+        </el-col>
+        <!-- 播放/暂停 -->
+        <el-col :span="2">
+          <div
+            class="flex items-center justify-center"
+            style="width:100%; heigth:100%;"
+          >
+            <el-button
+              size="large"
+              type="primary"
+              icon="el-icon-caret-right"
+              style="font-size: 1.25rem;"
+              circle
+              @click="togglePlayPause"
+            ></el-button>
+          </div>
+        </el-col>
+        <!-- 下一个 -->
+        <el-col :span="2">
+          <div
+            class="flex items-center justify-center"
+            style="width:100%; height:85%"
+          >
+            <el-button icon="el-icon-arrow-right" circle />
+          </div>
+        </el-col>
+        <el-col :span="10">
+          <div
+            class="flex items-center justify-center"
+            style="width:100%; height:85%"
+          ></div>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import { Form } from 'element-ui'
-import { cloneDeep } from 'lodash'
-import { getArticles, getPageviews, createArticle, updateArticle, defaultArticleData } from '@/api/articles'
-import { IArticleData } from '@/api/types'
-import { exportJson2Excel } from '@/utils/excel'
-import { formatJson } from '@/utils'
-import Pagination from '@/components/Pagination/index.vue'
+<script>
+import { getAlarmAlarm, getAlarmHistory, deleteAlgorit } from '@/api/alarm'
+import { VideostreamList_oilfield } from '@/api/videostream'
 
-const calendarTypeOptions = [
-  { key: 'CN', displayName: 'China' },
-  { key: 'US', displayName: 'USA' },
-  { key: 'JP', displayName: 'Japan' },
-  { key: 'EU', displayName: 'Eurozone' }
-]
-
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc: { [key: string]: string }, cur) => {
-  acc[cur.key] = cur.displayName
-  return acc
-}, {}) as { [key: string]: string }
-
-@Component({
-  name: 'ComplexTable',
-  components: {
-    Pagination
+export default {
+  name: "Icons",
+  data() {
+    return {
+      uuid:'',
+      info:'',
+      vsid:'',
+      videoKey: 0,
+      videoSource: "",
+      isPlaying: true,
+      dialogVisible: false,
+      dialogVisible2: false,
+      list:[],
+      historyList:[],
+      targetItem:{
+        image_url:'',
+        info:'',
+        details:''
+      },
+      videoGroupOptions: 
+      [
+            {
+                label: "等待数据注入",
+                options: [
+                    {
+                        value: "http://123.160.244.172:33334/live/local.live.mp4",
+                        label: "油田本地视频流(测试1)"
+                    },
+                    {
+                        value: "1",
+                        label: "空视频流(测试1)"
+                    },
+                    {
+                        value: "2",
+                        label: "空视频流(测试2)"
+                    }
+                ]
+            }
+        ]
+    };
   },
-  filters: {
-    typeFilter: (type: string) => {
-      return calendarTypeKeyValue[type]
-    }
-  }
-})
-export default class extends Vue {
-  private tableKey = 0
-  private list: IArticleData[] = []
-  private total = 0
-  private listLoading = true
-  private listQuery = {
-    page: 1,
-    limit: 20,
-    importance: undefined,
-    title: undefined,
-    type: undefined,
-    sort: '+id'
-  }
-
-  private importanceOptions = [1, 2, 3]
-  private calendarTypeOptions = calendarTypeOptions
-  private sortOptions = [
-    { label: 'ID Ascending', key: '+id' },
-    { label: 'ID Descending', key: '-id' }
-  ]
-
-  private statusOptions = ['published', 'draft', 'deleted']
-  private showReviewer = false
-  private dialogFormVisible = false
-  private dialogStatus = ''
-  private textMap = {
-    update: 'Edit',
-    create: 'Create'
-  }
-
-  private dialogPageviewsVisible = false
-  private pageviewsData = []
-  private rules = {
-    type: [{ required: true, message: 'type is required', trigger: 'change' }],
-    timestamp: [{ required: true, message: 'timestamp is required', trigger: 'change' }],
-    title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-  }
-
-  private downloadLoading = false
-  private tempArticleData = defaultArticleData
-
-  created() {
-    this.getList()
-  }
-
-  private async getList() {
-    this.listLoading = true
-    const { data } = await getArticles(this.listQuery)
-    this.list = data.items
-    this.total = data.total
-    // Just to simulate the time of the request
-    setTimeout(() => {
-      this.listLoading = false
-    }, 0.5 * 1000)
-  }
-
-  private handleFilter() {
-    this.listQuery.page = 1
-    this.getList()
-  }
-
-  private handleModifyStatus(row: any, status: string) {
-    this.$message({
-      message: '操作成功',
-      type: 'success'
-    })
-    row.status = status
-  }
-
-  private sortChange(data: any) {
-    const { prop, order } = data
-    if (prop === 'id') {
-      this.sortByID(order)
-    }
-  }
-
-  private sortByID(order: string) {
-    if (order === 'ascending') {
-      this.listQuery.sort = '+id'
-    } else {
-      this.listQuery.sort = '-id'
-    }
-    this.handleFilter()
-  }
-
-  private getSortClass(key: string) {
-    const sort = this.listQuery.sort
-    return sort === `+${key}` ? 'ascending' : 'descending'
-  }
-
-  private resetTempArticleData() {
-    this.tempArticleData = cloneDeep(defaultArticleData)
-  }
-
-  private handleCreate() {
-    this.resetTempArticleData()
-    this.dialogStatus = 'create'
-    this.dialogFormVisible = true
-    this.$nextTick(() => {
-      (this.$refs.dataForm as Form).clearValidate()
-    })
-  }
-
-  private createData() {
-    (this.$refs.dataForm as Form).validate(async(valid) => {
-      if (valid) {
-        const articleData = this.tempArticleData
-        articleData.id = Math.round(Math.random() * 100) + 1024 // mock a id
-        articleData.author = 'vue-typescript-admin'
-        const { data } = await createArticle({ article: articleData })
-        data.article.timestamp = Date.parse(data.article.timestamp)
-        this.list.unshift(data.article)
-        this.dialogFormVisible = false
+  async mounted() {
+    // setInterval(() => {
+    //   this.getAlarm()
+    // }, 3000); // 每秒执行一次
+    await this.getVideo()
+    await this.getHistory()
+  },
+  methods: {
+    watchItem(item) {
+      this.targetItem = item
+      this.targetItem.details = this.targetItem.details.replace(/\n/g, "<br>");
+      this.targetItem.details = this.targetItem.details.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+      this.dialogVisible2 = true
+    },
+    async getVideo() {
+      const res = await VideostreamList_oilfield()
+      console.log(res)
+      // res.data = []
+      if (res.code === 200 && res.data.length > 0) {
+        this.videoGroupOptions = [
+          {
+            label: "AI算法",
+            options: res.data.map(item => ({
+              value: item.play_url_mp4,
+              label: item.title
+            }))
+          }
+        ];
+        this.list = res.data
+        this.videoSource = res.data[0].play_url_mp4
+        this.vsid = res.data[0].vsid
+        this.reloadVideo();
+      } else {
         this.$notify({
-          title: '成功',
-          message: '创建成功',
-          type: 'success',
+          title: '失败',
+          message: 'playlist接口数据为空',
+          type: 'error',
           duration: 2000
         })
       }
-    })
-  }
-
-  private handleUpdate(row: any) {
-    this.tempArticleData = Object.assign({}, row)
-    this.tempArticleData.timestamp = +new Date(this.tempArticleData.timestamp)
-    this.dialogStatus = 'update'
-    this.dialogFormVisible = true
-    this.$nextTick(() => {
-      (this.$refs.dataForm as Form).clearValidate()
-    })
-  }
-
-  private updateData() {
-    (this.$refs.dataForm as Form).validate(async(valid) => {
-      if (valid) {
-        const tempData = Object.assign({}, this.tempArticleData)
-        tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-        const { data } = await updateArticle(tempData.id, { article: tempData })
-        const index = this.list.findIndex(v => v.id === data.article.id)
-        this.list.splice(index, 1, data.article)
-        this.dialogFormVisible = false
-        this.$notify({
-          title: '成功',
-          message: '更新成功',
-          type: 'success',
-          duration: 2000
-        })
+    },
+    async getAlarm() {
+      const res = await getAlarmAlarm({
+        vsid:this.vsid
+      })
+      if (res.code === 200) {
+        if(res.data.ac == 1 && this.uuid == res.data.uuid) { // 预警
+          this.dialogVisible = true
+          this.info = res.data.info
+        }
+        this.uuid == res.data.uuid
       }
-    })
+    },
+    async getHistory() {
+      const res = await getAlarmHistory({
+        vsid:this.vsid
+      })
+      if (res.code === 200) {
+        this.historyList = res.data
+      }
+    },
+    selectVideoSource(e) {
+      this.videoSource = e;
+      this.reloadVideo();
+      console.log(this.videoSource);
+      console.log(e);
+      this.vsid = this.list.find(item => item.play_url_mp4 === e).vsid
+      this.getHistory()
+    },
+    handleDelete() {
+      this.dialogVisible = !this.dialogVisible;
+    },
+    showDialog() {
+      console.log('点击');
+      this.dialogVisible = !this.dialogVisible;
+      console.log(this.dialogVisible);
+    },
+    togglePlayPause() {
+      if (this.$refs.video_ground) {
+        const video = this.$refs.video_ground;
+        if (video.paused) {
+          video.play();
+          this.isPlaying = true;
+        } else {
+          video.pause();
+          this.isPlaying = false;
+        }
+      }
+    },
+    reloadVideo() {
+      this.videoKey += 1; // 改变 key 以触发重新渲染
+    },
+    formatISODate(isoString) {
+      const date = new Date(isoString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    },
   }
-
-  private handleDelete(row: any, index: number) {
-    this.$notify({
-      title: 'Success',
-      message: 'Delete Successfully',
-      type: 'success',
-      duration: 2000
-    })
-    this.list.splice(index, 1)
-  }
-
-  private async handleGetPageviews(pageviews: string) {
-    const { data } = await getPageviews({ pageviews })
-    this.pageviewsData = data.pageviews
-    this.dialogPageviewsVisible = true
-  }
-
-  private handleDownload() {
-    this.downloadLoading = true
-    const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-    const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-    const data = formatJson(filterVal, this.list)
-    exportJson2Excel(tHeader, data, 'table-list')
-    this.downloadLoading = false
-  }
-}
+};
 </script>
+
+<style lang="scss" scoped>
+.icons-container {
+  margin: 0.625rem 1.25rem 0;
+  overflow: hidden;
+
+  .grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  }
+
+  .icon-item {
+    margin: 1.25rem;
+    height: 5.3125rem;
+    text-align: center;
+    width: 6.25rem;
+    float: left;
+    font-size: 1.875rem;
+    color: #24292e;
+    cursor: pointer;
+  }
+
+  span {
+    display: block;
+    // font-size: 1rem;
+    margin-top: 0.625rem;
+  }
+
+  .disabled {
+    pointer-events: none;
+  }
+
+  .radius {
+    position: relative;
+    height: auto;
+    width: 100%;
+    max-width: 120rem;
+    overflow: hidden;
+    border: 0.0625rem solid rgba(0, 0, 0, 0.2);
+    border-radius: 1.25rem;
+    margin-top: 0rem;
+    box-shadow: 0 0.125rem 0.5rem 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .video-ground {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+  }
+
+  .video-console {
+    background: #fff;
+    height: 6.25rem;
+    width: 100%;
+    position: fixed;
+    margin-left: -1.25rem;
+    bottom: 0;
+    box-shadow: 0.25rem -0.125rem 0.375rem rgb(0 21 41 / 35%);
+  }
+  .radius_icon {
+    position: absolute;
+    top: 3.75rem;
+    right: 0.625rem;
+    width: 3.125rem;
+    height: 3.125rem;
+    z-index: 100;
+    border-radius: 50%;
+  }
+  .dialog-content {
+    text-align: center;
+    margin-top: -0.625rem;
+  }
+  .dialog-content img {
+    width: 3.125rem;
+    height: 3.125rem;
+  }
+
+  .dialog-footer {
+    text-align: center;
+  }
+  .hint {
+    font-size: 0.875rem;
+    color: #999;
+    margin-top: 0.625rem;
+  }
+  // .btn {
+  //     cursor: pointer;
+  //     position: relative;
+  //     // top: 0rem;
+  //     // left: -1.125rem;
+  //     width: 3.75rem;
+  //     height: 3.75rem;
+  //     box-shadow: 0rem .125rem .5rem rgb(0 21 41 / 55%);
+  //     background: #38bdf8;
+  //     border-radius: 5rem;
+  //     color: #ffffff;
+  //     overflow: hidden;
+  // }
+
+  // .btn.canClick {
+  //     background: #38bdf8;
+  //     @apply hover: (shadow-lg shadow-gray-400);
+  // }
+
+  // .btn::after {
+  //     content: "";
+  //     background: #f1f1f1;
+  //     display: block;
+  //     position: absolute;
+  //     left: 50%;
+  //     top: 50%;
+  //     transform: translate(-50%, -50%);
+  //     width: 62.5rem;
+  //     height: 62.5rem;
+  //     border-radius: 100%;
+  //     opacity: 0;
+  //     transition: all 0.8s;
+  // }
+
+  // .btn.canClick:active:after {
+  //     width: .625rem;
+  //     height: .625rem;
+  //     opacity: 0.6;
+  //     transition: 0s;
+  // }
+
+  // .btn-down {
+  //     cursor: pointer;
+  //     position: relative;
+  //     /* top: 0rem;
+  //     left: -0.625rem; */
+  //     width: 2.5rem;
+  //     height: 2.5rem;
+  //     color: #000;
+  //     border-radius: 5rem;
+  //     overflow: hidden;
+  // }
+
+  // // .btn-down.canClick {
+  // //     background: #fff;/* 设置背景颜色为白色 */
+  // //     /* 其他基本样式 */
+  // //     transition: box-shadow 0.3s; /* 平滑过渡阴影效果 */
+  // // }
+  // // .btn-down.canClick:hover {
+  // //     box-shadow: 0 .25rem .375rem rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+  // //     /* 你可以根据需要调整阴影的参数 */
+  // // }
+
+  // .btn-down::after {
+  //     content: "";
+  //     background: #232424;
+  //     display: block;
+  //     position: absolute;
+  //     left: 50%;
+  //     top: 50%;
+  //     transform: translate(-50%, -50%);
+  //     width: 62.5rem;
+  //     height: 62.5rem;
+  //     border-radius: 100%;
+  //     opacity: 0;
+  //     transition: all 0.8s;
+  // }
+
+  // .btn-down.canClick:active:after {
+  //     width: .625rem;
+  //     height: .625rem;
+  //     opacity: 0.6;
+  //     transition: 0s;
+  // }
+}
+.modal-content {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  margin: 10px 10px auto;
+  padding: 0;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size:12px;
+
+  z-index: 10;
+  width: 30%; 
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}
+
+@keyframes animatetop {
+  from {top: -300px; opacity: 0}
+  to {top: 0; opacity: 1}
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 10px;
+  background-color: #0073e6; /* 深蓝色 */
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-legend {
+  display: flex;
+  gap: 6px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+}
+
+.status-icon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.status-icon.yellow {
+  background-color: #ffcc00;
+}
+
+.status-icon.red {
+  background-color: #ff3300;
+}
+
+.modal-body {
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.table-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: 11px; /* 进一步压缩字体 */
+}
+
+.status {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 10px;
+  margin-bottom: 5px;
+}
+
+.status.red {
+  background-color: #ff3300;
+}
+
+.status.yellow {
+  background-color: #ffcc00;
+}
+
+.column {
+  font-size: 12px;
+  color: #333333;
+  margin-bottom: 5px;
+}
+
+.vs-title {
+  width: 20%;
+}
+
+.info {
+  width: 40%;
+  color: #555555;
+}
+
+.alarm-time {
+  width: 30%;
+  color: #888888;
+}
+
+.view {
+  width: 10%;
+  color: #0073e6;
+  text-align: right;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.view:hover {
+  color: #005bb5;
+}
+
+
+
+.close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.itemImg {
+  display: block;
+  margin-bottom:30px;
+  height: 200px;
+}
+</style>

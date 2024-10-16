@@ -4,7 +4,7 @@
       <div class="radius">
         <!-- <img class="radius_icon" @click="showDialog()" src="@/assets/icon1.png" alt="" /> -->
   
-        <div class="modal-content">
+        <!-- <div class="modal-content">
           <div class="modal-header">
             <span class="title">历史识别记录</span>
             <div class="status-legend">
@@ -27,7 +27,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
   
   
   
@@ -139,7 +139,7 @@
   
   <script>
   import { getAlarmAlarm, getAlarmHistory, deleteAlgorit } from '@/api/alarm'
-  import { VideostreamList_aialgorithm } from '@/api/videostream'
+  import { VideostreamList } from '@/api/videostream'
   
   export default {
     name: "Icons",
@@ -169,7 +169,7 @@
       //   this.getAlarm()
       // }, 3000); // 每秒执行一次
       await this.getVideo()
-      await this.getHistory()
+    //   await this.getHistory()
     },
     methods: {
       watchItem(item) {
@@ -179,13 +179,13 @@
         this.dialogVisible2 = true
       },
       async getVideo() {
-        const res = await VideostreamList_aialgorithm()
+        const res = await VideostreamList()
         console.log(res)
         // res.data = []
         if (res.code === 200 && res.data.length > 0) {
           this.videoGroupOptions = [
             {
-              label: "AI算法",
+              label: "油田报警业务",
               options: res.data.map(item => ({
                 value: item.play_url_mp4,
                 label: item.title

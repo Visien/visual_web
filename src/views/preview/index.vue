@@ -7,24 +7,29 @@
       <div class="modal-content">
         <div class="modal-header">
           <span class="title">历史识别记录</span>
-          <div class="table-row header">
-            <div style="display:flex;align-items: center;margin-right: 20px;"><span class="status-icon yellow"></span><span>违规</span></div>
-            <div style="display:flex;align-items: center;"><span class="status-icon red"></span><span>风险</span></div>
+          <div class="status-legend">
+            <div class="legend-item">
+              <span class="status-icon yellow"></span><span>违规</span>
+            </div>
+            <div class="legend-item">
+              <span class="status-icon red"></span><span>风险</span>
+            </div>
           </div>
         </div>
         <div class="modal-body">
           <div class="table">
-            <div class="table-row" v-for="(item,index) in historyList" :key="index">
+            <div class="table-row" v-for="(item, index) in historyList" :key="index">
               <span class="status" :class="item.level > 3 ? 'red' : 'yellow'"></span>
-              <span style="width: 35%;">{{item.vs_title}}</span>
-              <span style="width: 40%;">{{item.info}}</span>
-              <span style="width: 35%;">{{formatISODate(item.alarm_time)}}</span>
-              <span style="width: 8%;" class="view" @click="watchItem(item)">查看</span>
+              <span class="column vs-title">{{item.vs_title}}</span>
+              <span class="column info">{{item.info}}</span>
+              <span class="column alarm-time">{{ item.alarm_time.replace('T', ' ') }}</span>
+              <span class="column view" @click="watchItem(item)">查看</span>
             </div>
-            <!-- 其他行可以类似地添加 -->
           </div>
         </div>
       </div>
+
+
 
       <video
         :key="videoKey"
@@ -175,7 +180,8 @@ export default {
     },
     async getVideo() {
       const res = await VideostreamList()
-      res.data = []
+      console.log(res)
+      // res.data = []
       if (res.code === 200 && res.data.length > 0) {
         this.videoGroupOptions = [
           {
@@ -288,7 +294,7 @@ export default {
 
   span {
     display: block;
-    font-size: 1rem;
+    // font-size: 1rem;
     margin-top: 0.625rem;
   }
 
@@ -436,12 +442,16 @@ export default {
 }
 .modal-content {
   position: absolute;
-  right:0;
+  right: 0px;
   top: 0px;
-  z-index: 10;
-  background-color: #fff;
+  margin: 10px 10px auto;
   padding: 0;
-  border: 1px solid #888;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size:12px;
+
+  z-index: 10;
   width: 30%; 
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
   animation-name: animatetop;
@@ -457,79 +467,109 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background-color: #1990ff;
-  color: white;
-  border-bottom: 1px solid #f5f5f5;
+  padding: 10px 10px;
+  background-color: #0073e6; /* 深蓝色 */
+  color: #ffffff;
   font-size: 12px;
+  font-weight: bold;
 }
 
-.modal-header .title {
-  font-size: 12px;
+.status-legend {
+  display: flex;
+  gap: 6px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+}
+
+.status-icon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.status-icon.yellow {
+  background-color: #ffcc00;
+}
+
+.status-icon.red {
+  background-color: #ff3300;
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
 }
 
 .table {
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .table-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  font-size: 12px;
-}
-.table-row span {
-  font-size: 12px;
-}
-.table-row.header {
-  font-weight: bold;
-}
-
-.status-icon {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin-right: 15px;
-  border-radius: 50%;
-}
-
-.status-icon.yellow {
-  background-color: yellow;
-}
-
-.status-icon.red {
-  background-color: red;
+  padding: 4px 10px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: 11px; /* 进一步压缩字体 */
 }
 
 .status {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin-right: 10px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-}
-
-.status.blue {
-  background-color: blue;
+  margin-right: 10px;
+  margin-bottom: 5px;
 }
 
 .status.red {
-  background-color: red;
+  background-color: #ff3300;
+}
+
+.status.yellow {
+  background-color: #ffcc00;
+}
+
+.column {
+  font-size: 12px;
+  color: #333333;
+  margin-bottom: 5px;
+}
+
+.vs-title {
+  width: 20%;
+}
+
+.info {
+  width: 40%;
+  color: #555555;
+}
+
+.alarm-time {
+  width: 30%;
+  color: #888888;
 }
 
 .view {
-  color: #007BFF;
+  width: 10%;
+  color: #0073e6;
+  text-align: right;
   cursor: pointer;
+  text-decoration: underline;
 }
 
 .view:hover {
-  text-decoration: underline;
+  color: #005bb5;
 }
+
+
 
 .close {
   color: #aaa;

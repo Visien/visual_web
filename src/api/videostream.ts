@@ -53,4 +53,40 @@ export const VideostreamList = (data: any) =>
     method: 'get',
     data
   })
-  
+
+
+export const VideostreamList_aialgorithm = (data: any) =>
+  request({
+    url: '/api/videostream/playlist?project=ai_algorithm',
+    method: 'get',
+    data
+  })
+
+
+export const VideostreamList_bodyanalysis = (data: any) =>
+  request({
+    url: '/api/videostream/playlist?project=body_analysis',
+    method: 'get',
+    data
+  })
+
+export const VideostreamList_postalindustry = (data: any) =>
+  request({
+    url: '/api/videostream/playlist?project=postal_industry',
+    method: 'get',
+    data
+  })
+
+export const VideostreamList_oilfield = (data: any) =>
+  request({
+    url: '/api/videostream/playlist?project=oil_field',
+    method: 'get',
+    data
+  })
+
+export const VideostreamList_ri = (data: any) =>
+  request({
+    url: '/api/videostream/playlist?project=研创展演示',
+    method: 'get',
+    data
+  })

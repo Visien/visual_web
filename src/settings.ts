@@ -12,14 +12,14 @@ interface ISettings {
 
 // You can customize below settings :)
 const settings: ISettings = {
-  title: 'ICON WEB TEST',
+  title: 'PRIV VISUAL WEB',
   showSettings: true,
   showTagsView: true,
   fixedHeader: false,
   showSidebarLogo: true,
   errorLog: ['production'],
   sidebarTextTheme: true,
-  devServerPort: 9527,
+  devServerPort: 30002,
   mockServerPort: 9528
 }
 

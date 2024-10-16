@@ -49,7 +49,7 @@ const bodyanalysisRoutes: RouteConfig = {
     },
     {
       path: 'face-recognition',
-      component: () => import(/* webpackChunkName: "dynamic-table" */ '@/views/bodyanalysis/index.vue'),
+      component: () => import(/* webpackChunkName: "dynamic-table" */ '@/views/bodyanalysis/face_recognition.vue'),
       name: 'FaceRecognition',
       meta: { title: 'FaceRecognition' }
     },
